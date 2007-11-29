@@ -3,7 +3,7 @@ Create unix package: python setup.py sdist
 Create windows package: python setup.py bdist_wininst
 """
 
-revision = '$Revision: 1488 $'
+revision = '$Revision$'
 
 from distutils.core import setup
 setup(name='Menu',

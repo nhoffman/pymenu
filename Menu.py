@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 
-__version__ = '$Id: Menu.py 1585 2007-10-29 17:00:37Z n.hoffman $'
+__version__ = '$Id$'
 
 import sys
 import os
