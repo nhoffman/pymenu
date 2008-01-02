@@ -54,6 +54,55 @@ def offer_list(options):
 				print '"%s" is not an available choice' % uinput
 			except ValueError:
 				print 'please choose a number'
+				
+def offer_options(options, default=None):
+    """options is a multiline string of the format 
+
+        choice | msg | varout
+        
+    choice is a number to select at the prompt
+    msg is a description of the choice
+    varout is the value that will be returned 
+    """
+    
+    while True:
+        print 'Please choose from the following options or Q to quit, then press return.\n'
+        print '%s) %s' % ('Q', 'quit')
+        d = {}
+        first_int = 0
+        last_choice = 'not an int'
+        for line in options.splitlines():
+            if line.strip() == '':
+                continue
+            choice, msg, varout = [x.strip() for x in line.split('|')]
+            choice = choice.upper()
+            
+            if choice == '#':
+                if isinstance(last_choice, int):
+                    choice = last_choice + 1
+                    last_choice = choice
+                else:
+                    choice = 1
+                    last_choice = 1
+            
+            d['%s' % choice] = varout 
+            print '%s) %s' % (choice, msg)
+        
+        if default:
+            print '[press return for %s]' % default
+        
+        
+        response = raw_input('\nPick a number or letter: ').upper()
+        
+        if response == 'Q':
+            log.info('user terminated program')
+            sys.exit('Quitting')
+        elif response == '' and default is not None:
+            return default
+        elif d.has_key(response):
+            return d[response]
+        else:
+            print '\nError: [%s] is not an option\n' % response
 
 def request_file_name(msg=None):
 	"""Prompt user for the name of a file; repeat if file not found.
