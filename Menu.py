@@ -8,6 +8,9 @@ import textwrap
 import string
 import logging
 
+if sys.version_info[0] == 3:
+    raw_input = input
+
 log = logging
 
 try:
@@ -19,11 +22,11 @@ except ImportError:
 ################### utility functions
 
 def clear_screen(lines=50):
-	print '\n'*lines
+	print (('\n'*lines))
 
 def check_file(filename):
 	if not os.access(filename,os.F_OK):
-		raise ResponseError, 'Error: cannot access %s ' % filename
+		raise ResponseError('Error: cannot access %s ' % filename)
 
 def offer_list(options):
 	"""Options is a list of values or (value, label) pairs"""
@@ -38,9 +41,9 @@ def offer_list(options):
 		except (ValueError,TypeError):
 			label = value
 		choices[i] = {'i':i,'value':value, 'label':label}
-		print fstr % choices[i]
+		print((fstr % choices[i]))
 	
-	print fstr % {'i':'X','label':'Exit this menu'}
+	print((fstr % {'i':'X','label':'Exit this menu'}))
 	
 	response = None
 	while True:
@@ -51,9 +54,9 @@ def offer_list(options):
 			try:
 				return choices[int(uinput)]['value']
 			except KeyError:
-				print '"%s" is not an available choice' % uinput
+				print(('"%s" is not an available choice' % uinput))
 			except ValueError:
-				print 'please choose a number'
+				print('please choose a number')
 				
 def offer_options(options, default=None):
     """options is a multiline string of the format 
@@ -66,8 +69,8 @@ def offer_options(options, default=None):
     """
     
     while True:
-        print 'Please choose from the following options or Q to quit, then press return.\n'
-        print '%s) %s' % ('Q', 'quit')
+        print(('Please choose from the following options or Q to quit, then press return.\n'))
+        print(('%s) %s' % ('Q', 'quit')))
         d = {}
         first_int = 0
         last_choice = 'not an int'
@@ -86,10 +89,10 @@ def offer_options(options, default=None):
                     last_choice = 1
             
             d['%s' % choice] = varout 
-            print '%s) %s' % (choice, msg)
+            print (('%s) %s' % (choice, msg)))
         
         if default:
-            print '[press return for %s]' % default
+            print (('[press return for %s]' % default))
         
         
         response = raw_input('\nPick a number or letter: ').upper()
@@ -99,10 +102,10 @@ def offer_options(options, default=None):
             sys.exit('Quitting')
         elif response == '' and default is not None:
             return default
-        elif d.has_key(response):
+        elif response in d:
             return d[response]
         else:
-            print '\nError: [%s] is not an option\n' % response
+            print (('\nError: [%s] is not an option\n' % response))
 
 def request_file_name(msg=None):
 	"""Prompt user for the name of a file; repeat if file not found.
@@ -110,9 +113,9 @@ def request_file_name(msg=None):
 	
 	while True:
 		if msg:
-			print ''
-			print textwrap.dedent(msg)
-			print ''
+			print ('')
+			print ((textwrap.dedent(msg)))
+			print ('')
 		
 		# note that dragging file icon into windows terminal generates external 
 		# double quotes which muct be removed
@@ -121,7 +124,7 @@ def request_file_name(msg=None):
 		if os.access(filename, os.F_OK):
 			return os.path.abspath(filename)
 		else:
-			print '---> File "%s" not found.' % filename
+			print (('---> File "%s" not found.' % filename))
 			options = """
 			1 | Try again | try_again
 			"""
@@ -276,7 +279,7 @@ class Menu:
 		try:						
 			val = fun(val)
 		except ValueError:
-			raise ResponseError, """'%s' is not a valid option""" % val
+			raise ResponseError("""'%s' is not a valid option""" % val)
 		
 		# don't check if file isn't specified
 		if opt.is_file and bool(val):			
@@ -292,8 +295,8 @@ class Menu:
 		Raises AssertionError if input dictionary contains keys not found in 
 		self.options"""
 		
-		for k,v in kwargs.items():
-			assert self.options.has_key(k)
+		for k,v in list(kwargs.items()):
+			assert k in self.options
 			opt = self.set_default(k,v)
 				
 	def add_option(self, key, label, val=None, 
@@ -337,7 +340,7 @@ class Menu:
 				
 		fstr = '%2s%s %s'
 		if self.cls: self.clear()
-		if header: print header,'\n'
+		if header: print ((header,'\n'))
 		
 		self.wrapper.width = self.width
 		self.pick = {}		
@@ -349,13 +352,13 @@ class Menu:
 			this_width = {1:self.width}.get(len(lines), self.width+2)
 						
 			if opt.val != '':
-				lines[-1] = string.ljust(lines[-1].rstrip(), this_width,'.')
+				lines[-1] =  lines[-1].rstrip().ljust(this_width,'.')
 			
 			help = '\n'.join(lines)
-			print fstr % (i, help, opt.val) + '\n'
-		print ' '*5 + '-'*self.width
-		print ' X' + self.wrapper.fill(self.xlabel)
-		print ' Q' + self.wrapper.fill(self.qlabel) + '\n'
+			print((fstr % (i, help, opt.val) + '\n'))
+		print((' '*5 + '-'*self.width))
+		print((' X' + self.wrapper.fill(self.xlabel)))
+		print((' Q' + self.wrapper.fill(self.qlabel) + '\n'))
 		self.cls = True
 
 	def ask_number(self):
@@ -365,7 +368,7 @@ class Menu:
 		
 		try:
 			if not response:
-				raise ResponseError, 'Please enter a number listed above'
+				raise ResponseError('Please enter a number listed above')
 			if response.lower() == 'x':
 				raise StopAsking
 			elif response.lower() == 'q':
@@ -374,9 +377,9 @@ class Menu:
 			# return an Option object
 			return self.pick[int(response)]
 		except KeyError:
-			raise  ResponseError, '%s is not an available option' % response
+			raise  ResponseError('%s is not an available option' % response)
 		except ValueError:
-			raise ResponseError, 'Please choose a number listed above'
+			raise ResponseError('Please choose a number listed above')
 	
 	def handle_response(self, opt=None):
 				
@@ -406,7 +409,7 @@ class Menu:
 			log.debug('set %s to [%s]' % (opt.key, opt.val))
 					
 	def get_dict(self):		
-		return dict([(k, o.val) for k,o in self.options.items()])
+		return dict([(k, o.val) for k,o in list(self.options.items())])
 		
 	def run(self, header=None):
 		"""
@@ -422,8 +425,8 @@ class Menu:
 				show = True
 			except StopAsking:
 				return self.get_dict()
-			except ResponseError, msg:
-				print '\n' + msg.__str__().strip()
+			except ResponseError as msg:
+				print(('\n' + msg.__str__().strip()))
 				show = False
 		
 		
@@ -460,11 +463,11 @@ if __name__ == '__main__':
 	def see_files(menu):
 		
 		files = glob.glob(os.path.join(os.path.split(__file__)[0],'*.py'))
-		print 'please select a file'
+		print('please select a file')
 		return offer_list(files)
 		
 	def hide_opt(menu):
-		print 'choose an option to hide'
+		print('choose an option to hide')
 		menu.visible.remove(offer_list([k for k in menu.keys if k in menu.visible]))
 		
 	usage = "Usage: Menu.py [options]"
