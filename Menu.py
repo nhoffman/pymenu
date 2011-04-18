@@ -1,6 +1,6 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 
-__version__ = '$Id$'
+__version__ = '0.2.0'
 
 import sys
 import os
