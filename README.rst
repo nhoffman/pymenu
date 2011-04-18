@@ -1,7 +1,8 @@
 Menu
 ====
 
-Creates a simple, interactive text-based user interface
+Creates a simple, interactive text-based user interface based on the
+configuration of an instance of ``optparse.OptionParser``
 
 Installation
 ------------
