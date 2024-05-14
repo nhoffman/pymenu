@@ -7,6 +7,7 @@ import os
 import textwrap
 import string
 import logging
+from typing import Optional
 
 if sys.version_info[0] == 3:
     raw_input = input
@@ -21,14 +22,16 @@ except ImportError:
     log.info('curses module not available for import')
 ################### utility functions
 
-def clear_screen(lines=50):
+def clear_screen(lines: int = 50) -> None:
 	print (('\n'*lines))
 
-def check_file(filename):
+
+def check_file(filename: string) -> None:
 	if not os.access(filename,os.F_OK):
 		raise ResponseError('Error: cannot access %s ' % filename)
 
-def offer_list(options):
+
+def offer_list(options) -> None:
 	"""Options is a list of values or (value, label) pairs"""
 	
 	fstr = '%(i)3s) %(label)s'
@@ -57,8 +60,9 @@ def offer_list(options):
 				print(('"%s" is not an available choice' % uinput))
 			except ValueError:
 				print('please choose a number')
-				
-def offer_options(options, default=None):
+
+
+def offer_options(options, default=None) -> None:
     """options is a multiline string of the format 
 
         choice | msg | varout
@@ -107,7 +111,8 @@ def offer_options(options, default=None):
         else:
             print (('\nError: [%s] is not an option\n' % response))
 
-def request_file_name(msg=None):
+
+def request_file_name(msg: Optional[str] = None) -> str:
 	"""Prompt user for the name of a file; repeat if file not found.
 	Return an absolute path."""
 	
@@ -172,7 +177,8 @@ if curses_ok:
     def send_editor(contents=None):
         return curses.wrapper(_send_editor, contents)
 
-def multiline_input(msg = None, prompt='# '):
+
+def multiline_input(msg: Optional[str] = None, prompt: str = '# ') -> str:
 	
 	if msg:
 		sys.stdout.write( msg + '\n')
@@ -190,8 +196,9 @@ def multiline_input(msg = None, prompt='# '):
 class StopAsking(Exception): pass
 class ResponseError(Exception): pass
 
+
 class Option:
-	def __init__(self):
+	def __init__(self) -> None:
 		self.send_editor = False
 		
 	def __getitem__(self, key):
@@ -208,12 +215,13 @@ class Option:
 		
 		return '\n'.join(['%6s : %s' % (k, getattr_safe(self,k,None)) for k in keys])
 
+
 class Menu:
 	"""
 	Creates a simple, interactive text-based user interface. 
 	"""
 	
-	def __init__(self, width=60, xlabel=None, qlabel=None, screenheight=50):
+	def __init__(self, width=60, xlabel=None, qlabel=None, screenheight=50) -> None:
 			
 		self.options = {} # self.options[key] = Option instance
 		self.keys = [] # provide order to the set of options
@@ -240,10 +248,10 @@ class Menu:
 	def get(self, key, alt=None):
 		return self.options.get(key, alt)
 
-	def clear(self):
+	def clear(self) -> None:
 		clear_screen(self.screenheight)
 
-	def add_parser_data(self, parser, options, exclude=None):
+	def add_parser_data(self, parser, options, exclude=None) -> None:
 
 		"""Add options using information from optparse.OptionParser 
 		object and options (output of parser.parse_args()). Options 
@@ -336,7 +344,7 @@ class Menu:
 		# the option is visible by default
 		self.visible.add(key)
 				
-	def display(self, header=None):	
+	def display(self, header=None) -> None:
 				
 		fstr = '%2s%s %s'
 		if self.cls: self.clear()
@@ -381,7 +389,7 @@ class Menu:
 		except ValueError:
 			raise ResponseError('Please choose a number listed above')
 	
-	def handle_response(self, opt=None):
+	def handle_response(self, opt=None) -> None:
 				
 		if not opt:
 			opt = self.ask_number()
@@ -411,7 +419,7 @@ class Menu:
 	def get_dict(self):		
 		return dict([(k, o.val) for k,o in list(self.options.items())])
 		
-	def run(self, header=None):
+	def run(self, header=None) -> None:
 		"""
 		Present the user with a menu of options."""
 		
@@ -531,4 +539,3 @@ if __name__ == '__main__':
 	menu.set_defaults(**d)
 	# print the values of the option, value pairs on completion
 	pprint.PrettyPrinter().pprint(menu.run())
-	
