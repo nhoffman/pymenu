@@ -26,7 +26,7 @@ def clear_screen(lines: int = 50) -> None:
 	print (('\n'*lines))
 
 
-def check_file(filename: string) -> None:
+def check_file(filename: str) -> None:
 	if not os.access(filename,os.F_OK):
 		raise ResponseError('Error: cannot access %s ' % filename)
 
